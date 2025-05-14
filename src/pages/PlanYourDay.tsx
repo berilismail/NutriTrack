@@ -49,13 +49,15 @@ export default function PlanYourDay() {
       <Navbar />
       <Box
         sx={{
-          px: 4,
-          py: 4,
-          maxWidth: "600px",
-          margin: "0 auto", 
           backgroundColor: "white",
           borderRadius: "8px",
           boxShadow: 3, 
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "86vh",
+          padding: 2,
         }}
       >
       <Box sx={{ px: 4, py: 4 }}>
