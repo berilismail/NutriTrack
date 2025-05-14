@@ -2,32 +2,38 @@ import React, { useState } from "react";
 import axios from "axios";
 import { TextField, Button, Typography, Box, CircularProgress, Alert } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import Navbar from "./Navbar"; 
+import * as Yup from "yup";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+
 
 const LogIn = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Handle form submission
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const validationSchema = Yup.object({
+    username: Yup.string().required("Username is empty"),
+    password: Yup
+    .string()
+    .required('Please Enter your password')
+    .matches(
+      /^(?=.*[a-z])(?=.{8,})/,
+      "Must contain at least 8 characters, one uppercase, one lowercase, one number, and one special character"
+    ),  })
+
+  const handleLogin = async (values: { username: string; password: string }) => {
     setLoading(true);
-    setError(null); // Reset error message before each login attempt
+    setError(null);
 
     try {
-      // Send POST request to the dummyjson login API (replace the URL if you have a real API)
       const response = await axios.post("https://dummyjson.com/auth/login", {
-        username: email,
-        password: password,
+        username: values.username,
+        password: values.password,
       });
 
-      // Assuming the response includes a token, handle login success
       if (response.data) {
         localStorage.setItem("userToken", response.data.token);
-        navigate("/dashboard"); // Navigate to a different page on successful login
+        navigate("/dashboard");
       }
     } catch (err: any) {
       setError("Invalid email or password.");
@@ -35,75 +41,70 @@ const LogIn = () => {
       setLoading(false);
     }
   };
-
+  
   return (
-    <div>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "86vh",
-          padding: 2,
-        }}
-      >
-        <Typography variant="h3" sx={{ marginBottom: 3 }}>
+    <Box
+      sx={{
+        minHeight: "86vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#f9f9f9",
+        p: 2,
+      }}
+    >
+      <Box sx={{ width: "100%", maxWidth: 400 }}>
+        <Typography variant="h3" textAlign="center" mb={3}>
           Login
         </Typography>
 
-        <Box
-          component="form"
+        <Formik
+          initialValues={{ username: "", password: "" }}
+          validationSchema={validationSchema}
           onSubmit={handleLogin}
-          sx={{
-            maxWidth: 400,
-            width: "100%",
-            padding: 3,
-            borderRadius: 3,
-            boxShadow: 3,
-            backgroundColor: "white",
-          }}
         >
-          {/* Email input */}
-          <TextField
-            label="Email"
-            variant="outlined"
-            fullWidth
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            sx={{ marginBottom: 2 }}
-            required
-          />
+          {({ isSubmitting }) => (
+            <Form>
+              <Field
+                as={TextField}
+                name="username"
+                label="Username"
+                fullWidth
+                sx={{ mb: 2 }}
+                variant="outlined"
+                error={!!error}
+                helperText={<ErrorMessage name="username" />}
+              />
 
-          {/* Password input */}
-          <TextField
-            label="Password"
-            type="password"
-            variant="outlined"
-            fullWidth
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            sx={{ marginBottom: 3 }}
-            required
-          />
+              <Field
+                as={TextField}
+                name="password"
+                label="Password"
+                type="password"
+                fullWidth
+                sx={{ mb: 2 }}
+                variant="outlined"
+                error={!!error}
+                helperText={<ErrorMessage name="password" />}
+              />
 
-          {/* Error message */}
-          {error && <Alert severity="error" sx={{ marginBottom: 2 }}>{error}</Alert>}
+              {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
-          {/* Login button */}
-          <Button
-            variant="contained"
-            color="primary"
-            type="submit"
-            fullWidth
-            sx={{ padding: "12px", fontSize: "16px" }}
-            disabled={loading}
-          >
-            {loading ? <CircularProgress size={24} color="inherit" /> : "Login"}
-          </Button>
-        </Box>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                fullWidth
+                disabled={isSubmitting || loading}
+                sx={{ py: 1.5, fontSize: "16px" }}
+              >
+                {loading ? <CircularProgress size={24} color="inherit" /> : "Login"}
+              </Button>
+            </Form>
+          )}
+        </Formik>
       </Box>
-    </div>
+    </Box>
   );
 };
 
