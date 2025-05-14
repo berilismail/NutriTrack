@@ -10,6 +10,7 @@ import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import { Link } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 const pages = [
     { label: 'Recipes', path: '/dashboard' },
     { label: 'Plan Your Day', path: '/plan' },
@@ -17,6 +18,7 @@ const pages = [
   ];
 
 function Navbar() {
+      const navigate = useNavigate();
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -95,6 +97,15 @@ function Navbar() {
               </Button>
             ))}
           </Box>
+          <Button
+        onClick={() => {
+        localStorage.removeItem("userToken");
+        navigate('/') 
+        }}
+            sx={{ my: 2, color: 'white', display: 'block' }}
+        >
+        Log Out
+        </Button>
         </Toolbar>
       </Container>
     </AppBar>
