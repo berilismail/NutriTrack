@@ -21,14 +21,13 @@ export const CalorieProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  // Save to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem("totalCalories", totalCalories.toString());
   }, [totalCalories]);
 
   const addCalories = (amount: number) => {
     setTotalCalories((prev) => prev + amount);
-  };
+  };    
 
   const resetCalories = () => {
     setTotalCalories(0);
